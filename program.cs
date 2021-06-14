@@ -1,4 +1,4 @@
-//Assignment-2 DIS
+//assignment_2
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -359,7 +359,7 @@ namespace Programming_Assignment_2_Summer_2021
                 throw;
             }
         }
-        //
+        
 
         //Question 6:
         /// <summary>
@@ -372,19 +372,28 @@ namespace Programming_Assignment_2_Summer_2021
         //Explanation: The sum of 2 and 7 is 9. Therefore index1 = 1, index2 = 2.
 
         /// </summary>
-        private static int[] targetSum(int[] nums, int target)
+        private static void targetSum(int[] nums, int target)
         {
             try
             {
-                var dict = new Dictionary<int, int>();
-                for (int i = 0; i < nums.Length; i++)
+                int p = 0, q = nums.Length - 1;
+
+                while (p < q)
                 {
-                    if (dict.ContainsKey(target - nums[i]))
-                        return new int[] { dict[target - nums[i]], i };
-                    dict[nums[i]] = i;
+                    if (nums[p] + nums[q] == target)
+                    {
+                        Console.WriteLine("[" + (p + 1) + "," + (q + 1) + "]");
+                        break;
+                    }
+                    else if (nums[p] + nums[q] > target)
+                        q--;
+                    else
+                        p++;
+
                 }
 
-                return null;
+
+                   
             }
 
             catch (Exception)
@@ -421,6 +430,38 @@ namespace Programming_Assignment_2_Summer_2021
         {
             try
             {
+                List<int[]> list = new List<int[]>();
+                List<int[,]> list1 = new List<int[,]>();
+
+                for (int k = 0; k < items.GetLength(0); k++)
+                {
+                    list.Add(new int[] { items[k, 0], items[k, 1] });
+                }
+                list.Sort((x, y) => { return (x[0] < y[0]) ? -1 : ((x[0] == y[0]) ? ((x[1] <= y[1]) ? 1 : -1) : 1); });
+                int value = list[0][0];
+                int items_count = 1;
+                int final_total = list[0][1];
+
+                for (int k = 1; k < list.Count; k++)
+                {
+                    if (list[k][0] == value && items_count < 5)
+                    {
+                        final_total += list[k][1];
+                        items_count += 1;
+                    }
+                    else if (list[k][0] != value)
+                    {
+                        list1.Add(new int[,] { { value, final_total / 5 } });
+
+                        Console.Write("[[" + value + "," + final_total / 5 + "]" + ",");
+                        value = list[k][0];
+                        items_count = 1;
+                        final_total = list[k][1];
+                    }
+                }
+                list1.Add(new int[,] { { value, final_total / 5 } });
+                Console.Write("[" + value + "," + final_total / 5 + "]]");
+                Console.Write("\n");
             }
             catch (Exception)
             {
@@ -452,18 +493,26 @@ namespace Programming_Assignment_2_Summer_2021
         {
             try
             {
-                int[] final_output = new int[arr.Length];
-                int new_length = arr.Length;
-                for (int k = 0; k < arr.Length; k++)
-                { 
-                    final_output[(k + n) % new_length] = arr[k]; 
+                var loc = 0;
+                var current_loc = 0;
+                var loc_current = arr[current_loc];
 
-                }
                 for (int k = 0; k < arr.Length; k++)
                 {
-                    arr[k] = final_output[k];
+                    current_loc = (current_loc + n) % arr.Length;
+
+
+                    var val_temp = arr[current_loc];
+                    arr[current_loc] = loc_current;
+                    loc_current = val_temp;
+
+                    if (current_loc == loc)
+                    {
+                        current_loc = (++loc) % arr.Length;
+                        loc_current = arr[current_loc];
+                    }
                 }
-                Console.WriteLine(final_output);
+                Console.WriteLine(String.Join(",", arr));
             }
             catch (Exception)
             {
@@ -515,6 +564,8 @@ namespace Programming_Assignment_2_Summer_2021
                 throw;
             }
         }
+        //Here,the time complexity is O(n).
+        //here,we have learnt about contiguous subarray concept and we will return its sum.
 
         //Question 10
         /// <summary>
@@ -532,23 +583,37 @@ namespace Programming_Assignment_2_Summer_2021
         {
             try
             {
-                int first_cost = costs[0];
-                int second_cost = costs[1];
-                int normal_Cost = 0;
-                for (int k = 2; k < costs.Length; k++)
+                int no_of_steps = costs.Length;
+                if (no_of_steps == 0)
+                    return 0;
+                else if (no_of_steps == 1)
+                    return costs[0];
+                else if (no_of_steps <= 1000)
                 {
-                    normal_Cost = costs[k] + Math.Min(first_cost, second_cost);
-                    first_cost = second_cost;
-                    second_cost = normal_Cost;
-                }
-                return Math.Min(first_cost, second_cost);
+                    for (int k = 2; k < no_of_steps; k++)
+                    {
+                        //handling constraints
+                        if (costs[k] >= 0 && costs[k] <= 999)
+                            //calculating the minimum cost
+                            costs[k] = Math.Min(costs[k - 1], costs[k - 2]) + costs[k];
+                        else
+                            throw new Exception();
+                    }
 
+                    return Math.Min(costs[no_of_steps - 2], costs[no_of_steps - 1]);
+
+                }
+                else
+                    throw new Exception();
             }
+            
             catch (Exception)
             {
-
+                Console.WriteLine("Constraints violated:Exception occurred in MinCostToClimb function\n");
+                return 0;
                 throw;
             }
         }
     }
 }
+//here,we will return the minimum cost to reach the top of the floor.
